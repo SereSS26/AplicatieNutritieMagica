@@ -3,11 +3,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+<<<<<<< HEAD
 import { Play, Star, Clock, Flame, Trophy, X, MessageSquare, ThumbsUp, Loader2, Brain, Dumbbell, Camera, ScanLine, Activity } from 'lucide-react';
+=======
+import { Play, Star, Clock, Flame, Trophy, X, MessageSquare, ThumbsUp, Loader2, Brain, Dumbbell, Camera, ScanLine } from 'lucide-react';
+import { supabase } from '@/src/lib/supabase';
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 import PoseEstimationCanvas from '@/src/components/dashboard/PoseEstimationCanvas';
 import { useAuth } from '@/src/hooks/useAuth';
 import { useDashboardContext } from '@/src/context/DashboardContext';
 
+<<<<<<< HEAD
 interface Exercise {
   name: string;
   sets: string;
@@ -41,6 +47,12 @@ interface Workout {
 const CATEGORIES = ["Toate", "Full Body", "Cardio", "Picioare", "Piept & Brațe", "Abdomen"];
 
 const WORKOUTS: Workout[] = [
+=======
+// --- DATE MOCKUP (Aici poți conecta baza de date Supabase mai târziu) ---
+const CATEGORIES = ["Toate", "Full Body", "Cardio", "Picioare", "Piept & Brațe", "Abdomen"];
+
+const WORKOUTS = [
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   {
     id: 1,
     title: "HIIT Extrem - Ardere Grăsimi",
@@ -214,6 +226,7 @@ export default function AntrenamentePage() {
   const { userId } = useAuth();
   const { dailyStats } = useDashboardContext();
   const [selectedCategory, setSelectedCategory] = useState("Toate");
+<<<<<<< HEAD
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [aiPlan, setAiPlan] = useState<AiPlan | null>(null);
@@ -221,6 +234,15 @@ export default function AntrenamentePage() {
   
   // Stare pentru AI Coach (Camera)
   const [isTimeToMoveOpen, setIsTimeToMoveOpen] = useState(false);
+=======
+  const [selectedWorkout, setSelectedWorkout] = useState<typeof WORKOUTS[0] | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [aiPlan, setAiPlan] = useState<any>(null);
+  const [loadingAi, setLoadingAi] = useState(false);
+  
+  // Stare pentru AI Coach (Camera)
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   const [accuracyScore, setAccuracyScore] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -234,11 +256,20 @@ export default function AntrenamentePage() {
   const otherWorkouts = filteredWorkouts.filter(w => w.id !== recommendedWorkout?.id);
 
   // Funcție pentru a deschide modalul și a genera antrenamentul
+<<<<<<< HEAD
   const handleOpenWorkout = async (workout: Workout) => {
     setSelectedWorkout(workout);
     
     // Dacă avem un video (Local sau YouTube), NU mai generăm planul AI.
     if (workout.videoUrl || workout.videoId) return;
+=======
+  const handleOpenWorkout = async (workout: typeof WORKOUTS[0]) => {
+    setIsCameraOpen(false); // Resetăm camera la deschidere
+    setSelectedWorkout(workout);
+    
+    // Dacă avem un video (Local sau YouTube), NU mai generăm planul AI.
+    if ((workout as any).videoUrl || (workout as any).videoId) return;
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
     setAiPlan(null); // Resetăm planul vechi
     setLoadingAi(true);
@@ -303,7 +334,11 @@ export default function AntrenamentePage() {
         playPromise.catch(e => console.log("Autoplay prevented:", e));
       }
     }
+<<<<<<< HEAD
   }, [selectedWorkout]);
+=======
+  }, [selectedWorkout, isCameraOpen]);
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -314,6 +349,7 @@ export default function AntrenamentePage() {
     <div className="p-6 md:p-10 min-h-screen text-white pb-32">
       
       {/* Header */}
+<<<<<<< HEAD
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black italic uppercase tracking-tighter mb-2">
@@ -333,6 +369,13 @@ export default function AntrenamentePage() {
             <span className="leading-none text-sm">TIME TO MOVE (5 MIN)</span>
           </div>
         </button>
+=======
+      <div className="mb-10">
+        <h1 className="text-4xl font-black italic uppercase tracking-tighter mb-2">
+          Sala de <span className="text-fuchsia-500">Antrenament</span>
+        </h1>
+        <p className="text-gray-400">Alege zona pe care vrei să o lucrezi astăzi.</p>
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
       </div>
 
       {/* Categorii */}
@@ -432,18 +475,27 @@ export default function AntrenamentePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+<<<<<<< HEAD
             className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+=======
+            className={`fixed inset-0 z-[200] flex items-center justify-center ${isCameraOpen ? 'p-0' : 'p-4'} bg-black/80 backdrop-blur-sm`}
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
             onClick={() => setSelectedWorkout(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
+<<<<<<< HEAD
               className="bg-[#0a0a0a] w-full max-w-5xl max-h-[90vh] rounded-3xl overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row transition-all duration-500"
+=======
+              className={`bg-[#0a0a0a] ${isCameraOpen ? 'w-full h-full rounded-none max-w-none max-h-none' : 'w-full max-w-5xl max-h-[90vh] rounded-3xl'} overflow-hidden border border-white/10 shadow-2xl flex flex-col md:flex-row transition-all duration-500`}
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
               onClick={(e) => e.stopPropagation()}
             >
               
               {/* Partea Stângă: VIDEO PLAYER (Local) sau PLAN AI */}
+<<<<<<< HEAD
               <div className="w-full md:w-2/3 bg-black relative flex flex-col justify-center overflow-hidden transition-all duration-500">
                 {/* Verificăm dacă avem Video Local SAU YouTube */}
                 {selectedWorkout.videoUrl || selectedWorkout.videoId ? (
@@ -457,6 +509,32 @@ export default function AntrenamentePage() {
                           width="100%" 
                           height="100%" 
                           src={`https://www.youtube.com/embed/${selectedWorkout.videoId}?autoplay=1&rel=0&controls=1`} 
+=======
+              <div className={`${isCameraOpen ? 'w-full h-full' : 'w-full md:w-2/3'} bg-black relative flex flex-col justify-center overflow-hidden transition-all duration-500`}>
+                {/* Verificăm dacă avem Video Local SAU YouTube */}
+                {(selectedWorkout as any).videoUrl || (selectedWorkout as any).videoId ? (
+                  <div className="relative w-full h-full flex">
+                    
+                    {/* Buton Plutitor de Ieșire (Doar în Fullscreen) */}
+                    {isCameraOpen && (
+                      <button 
+                        onClick={() => setIsCameraOpen(false)}
+                        className="absolute top-6 right-6 z-50 bg-red-600/90 hover:bg-red-600 text-white px-5 py-2.5 rounded-full font-bold shadow-[0_0_20px_rgba(220,38,38,0.5)] flex items-center gap-2 backdrop-blur-md transition-all hover:scale-105 border border-white/20"
+                      >
+                        <X size={18} /> Ieși din Modul Live
+                      </button>
+                    )}
+
+                    {/* CONTAINER VIDEO (LOCAL SAU YOUTUBE) */}
+                    <div className={`relative transition-all duration-500 ${isCameraOpen ? 'w-1/2 border-r border-white/10' : 'w-full'}`}>
+                      
+                      {/* A. Dacă e YouTube */}
+                      {(selectedWorkout as any).videoId && !(selectedWorkout as any).videoUrl ? (
+                        <iframe 
+                          width="100%" 
+                          height="100%" 
+                          src={`https://www.youtube.com/embed/${(selectedWorkout as any).videoId}?autoplay=1&rel=0&controls=1`} 
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
                           title="YouTube video player" 
                           frameBorder="0" 
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
@@ -467,15 +545,77 @@ export default function AntrenamentePage() {
                       /* B. Dacă e Video Local */
                       <video
                         ref={videoRef}
+<<<<<<< HEAD
                         src={selectedWorkout.videoUrl}
                         controls
+=======
+                        src={(selectedWorkout as any).videoUrl}
+                        controls={!isCameraOpen}
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
                         autoPlay
                         loop
                         playsInline
                         className="w-full h-full object-contain bg-black"
                       /> 
                       )}
+<<<<<<< HEAD
                     </div>
+=======
+
+                      {/* Label Video */}
+                      {isCameraOpen && (
+                        <div className="absolute top-4 left-4 bg-black/60 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold text-white border border-white/10">
+                          ANTRENOR
+                        </div>
+                      )}
+                    </div>
+  
+                    {/* WEBCAM USER (AI COACH) */}
+                    {isCameraOpen && (
+                      <div className="w-1/2 relative">
+                        <PoseEstimationCanvas 
+                          onAccuracyChange={setAccuracyScore} 
+                          trainerVideoRef={videoRef} // Trimitem referința video-ului local către AI
+                        />
+                        {/* Overlay AI - HUD */}
+                        <div className="absolute inset-0 pointer-events-none">
+                          {/* Grid de scanare */}
+                          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+                          <div className="absolute top-4 right-4 bg-red-600/80 backdrop-blur px-3 py-1 rounded-lg text-xs font-bold text-white flex items-center gap-2 animate-pulse">
+                            <div className="w-2 h-2 bg-white rounded-full"></div> LIVE
+                          </div>
+  
+                          {/* Scorul de Acuratețe */}
+                          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-3/4 bg-black/60 backdrop-blur-xl border border-fuchsia-500/30 rounded-2xl p-4">
+                            <div className="flex justify-between items-end mb-2">
+                              <span className="text-fuchsia-400 text-xs font-bold uppercase tracking-widest">Acuratețe Mișcare</span>
+                              <span className="text-2xl font-black text-white">{accuracyScore}%</span>
+                            </div>
+                            <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                              <motion.div
+                                animate={{ width: `${accuracyScore}%` }}
+                                transition={{ type: "spring", stiffness: 50 }}
+                                className={`h-full rounded-full ${accuracyScore > 90 ? 'bg-green-500' : accuracyScore > 70 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                              />
+                            </div>
+                            <p className="text-center text-xs text-gray-300 mt-2 font-mono">
+                              {accuracyScore > 85 
+                                ? "EXCELENT! Menține ritmul." 
+                                : accuracyScore > 60 
+                                  ? "Bun, dar atenție la postură." 
+                                  : "Corectează poziția! Nu te opri."}
+                            </p>
+                          </div>
+  
+                          {/* Linii de scanare decorative */}
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] border border-white/10 rounded-3xl">
+                            <ScanLine className="absolute top-4 left-4 text-fuchsia-500/50" size={24} />
+                            <ScanLine className="absolute bottom-4 right-4 text-fuchsia-500/50 rotate-180" size={24} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
                   </div>
                 ) : (
                   /* Cazul 2: Nu avem video, folosim AI-ul */
@@ -500,7 +640,11 @@ export default function AntrenamentePage() {
                           <h4 className="text-white font-black uppercase text-lg flex items-center gap-2">
                             <Dumbbell className="text-fuchsia-500" /> Rutina Principală
                           </h4>
+<<<<<<< HEAD
                           {aiPlan.exercises?.map((ex: Exercise, idx: number) => (
+=======
+                          {aiPlan.exercises?.map((ex: any, idx: number) => (
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
                             <div key={idx} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-start gap-4 hover:bg-white/10 transition-colors group">
                               <div className="bg-white/10 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-fuchsia-500 shrink-0 group-hover:bg-fuchsia-500 group-hover:text-white transition-colors">
                                 {idx + 1}
@@ -530,6 +674,10 @@ export default function AntrenamentePage() {
               </div>
 
               {/* Partea Dreaptă: Detalii & Recenzii */}
+<<<<<<< HEAD
+=======
+              {!isCameraOpen && (
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
               <div className="w-full md:w-1/3 flex flex-col h-[50vh] md:h-auto border-l border-white/10 transition-all duration-500">
                 
                 {/* Header Modal */}
@@ -546,6 +694,21 @@ export default function AntrenamentePage() {
                   </button>
                 </div>
 
+<<<<<<< HEAD
+=======
+                {/* Buton Activare AI Coach */}
+                <div className="px-6 pb-4">
+                    <button 
+                      onClick={() => setIsCameraOpen(!isCameraOpen)}
+                      className={`w-full py-3 rounded-xl font-bold text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all ${
+                        isCameraOpen ? 'bg-red-500/10 text-red-500 border border-red-500/50 hover:bg-red-500/20' : 'bg-white/5 text-white border border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                      {isCameraOpen ? <><X size={16} /> Oprește Camera</> : <><Camera size={16} /> Analiză AI Live</>}
+                    </button>
+                </div>
+
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
                 {/* Tab-uri / Statistici */}
                 <div className="grid grid-cols-3 border-b border-white/10 divide-x divide-white/10 bg-white/5">
                   <div className="p-4 text-center">
@@ -582,7 +745,11 @@ export default function AntrenamentePage() {
                               ))}
                             </div>
                           </div>
+<<<<<<< HEAD
                           <p className="text-gray-300 text-sm italic">&quot;{review.text}&quot;</p>
+=======
+                          <p className="text-gray-300 text-sm italic">"{review.text}"</p>
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
                         </div>
                       ))
                     ) : (
@@ -609,6 +776,10 @@ export default function AntrenamentePage() {
                 </div>
 
               </div>
+<<<<<<< HEAD
+=======
+              )}
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
             </motion.div>
           </motion.div>
         )}
@@ -616,6 +787,7 @@ export default function AntrenamentePage() {
       document.body
       )}
 
+<<<<<<< HEAD
       {/* MODAL TIME TO MOVE (AI CAMERA FULLSCREEN) */}
       {mounted && createPortal(
         <AnimatePresence>
@@ -677,6 +849,8 @@ export default function AntrenamentePage() {
         document.body
       )}
 
+=======
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
     </div>
   );
 }

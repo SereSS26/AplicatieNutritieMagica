@@ -11,9 +11,13 @@ import {
   LineChart, 
   Settings, 
   LogOut,
+<<<<<<< HEAD
   Clock,
   ChevronRight,
   User // <-- AM ADĂUGAT ICONIȚA AICI
+=======
+  ChevronRight
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
 
@@ -22,9 +26,13 @@ const navItems = [
   { name: 'Acasă', href: '/dashboard', icon: Home },
   { name: 'Nutriție', href: '/dashboard/nutritie', icon: Flame },
   { name: 'Antrenamente', href: '/dashboard/antrenamente', icon: Dumbbell },
+<<<<<<< HEAD
   { name: 'Simulator', href: '/dashboard/simulator', icon: Clock },
   { name: 'Progres', href: '/dashboard/progres', icon: LineChart },
   { name: 'Profilul Meu', href: '/dashboard/profil', icon: User } // <-- AM REPARAT OBIECTUL AICI
+=======
+  { name: 'Progres', href: '/dashboard/progres', icon: LineChart },
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 ];
 
 export default function Sidebar() {
@@ -68,8 +76,14 @@ export default function Sidebar() {
 
       {/* Logo & Branding */}
       <div className="p-6">
+<<<<<<< HEAD
         <Link href="/" className="flex items-center gap-3 group">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-fuchsia-600 to purple-600 p-[1px] group-hover:scale-105 transition-transform shadow-[0_0_20px_rgba(217,70,239,0.3)] shrink-0">
+=======
+        {/* AICI AM MODIFICAT: href="/" în loc de "/dashboard" */}
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-fuchsia-600 to-purple-600 p-[1px] group-hover:scale-105 transition-transform shadow-[0_0_20px_rgba(217,70,239,0.3)] shrink-0">
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
              <div className="h-full w-full bg-[#0a0a0a] rounded-xl flex items-center justify-center">
                 <Dumbbell className="w-5 h-5 text-white" />
              </div>
@@ -114,7 +128,11 @@ export default function Sidebar() {
               <Icon size={20} className={`transition-colors duration-300 ${isActive ? 'text-fuchsia-400' : 'group-hover:text-fuchsia-400'}`} />
               <span className="font-medium text-sm tracking-wide">{item.name}</span>
               
+<<<<<<< HEAD
               {/* Săgeată subtilă la hover */}
+=======
+              {/* Săgeată subtilă la hover, arată ca în aplicațiile native de iOS */}
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
               <ChevronRight 
                 size={16} 
                 className={`ml-auto opacity-0 -translate-x-2 transition-all duration-300 ${
@@ -134,6 +152,10 @@ export default function Sidebar() {
           onClick={handleSettings}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-gray-400 hover:text-white hover:bg-white/5 transition-all duration-300 group"
         >
+<<<<<<< HEAD
+=======
+          {/* Rotița se învârte subtil la hover */}
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
           <Settings size={20} className="group-hover:rotate-90 transition-transform duration-500 group-hover:text-blue-400" />
           <span className="font-medium text-sm tracking-wide">Setări</span>
         </button>
@@ -142,6 +164,10 @@ export default function Sidebar() {
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-red-500/80 hover:text-red-400 hover:bg-red-500/10 transition-all duration-300 group"
         >
+<<<<<<< HEAD
+=======
+          {/* Iconița "iese pe ușă" la hover */}
+>>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
           <LogOut size={20} className="group-hover:-translate-x-1 transition-transform duration-300" />
           <span className="font-medium text-sm tracking-wide">Deconectare</span>
         </button>
