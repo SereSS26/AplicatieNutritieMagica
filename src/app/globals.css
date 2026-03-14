@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================================
+   1. SCROLLBAR GLOBAL (PENTRU TOATĂ FEREASTRA BROWSERULUI)
+   Apare automat pe marginile ecranului.
+   ========================================= */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #030303; /* Fundalul închis al aplicației tale */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15); /* Alb semi-transparent */
+  border-radius: 20px;
+  border: 3px solid #030303; /* Crează un efect premium de margine goală */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d946ef; /* Culoarea Fuchsia când pui mouse-ul */
+}
+
+/* Suport global pentru Firefox */
+html {
+  scrollbar-color: rgba(255, 255, 255, 0.15) #030303;
+  scrollbar-width: thin;
+}
+
+/* =========================================
+   2. SCROLLBAR SPECIFIC PENTRU CONTAINERE MICI (MODALE/LISTE)
+   Se aplică doar unde pui className="custom-scrollbar"
+   ========================================= */
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px; /* Mai subțire decât cea globală */
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent; /* Fundal invizibil ca să se vadă blur-ul din modale */
+    border-radius: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1); 
+    border-radius: 10px;
+    border: none; 
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #d946ef;
+  }
+
+  /* Suport Firefox pentru elemente cu clasa custom-scrollbar */
+  .custom-scrollbar {
+    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-width: thin;
+  }
+}
