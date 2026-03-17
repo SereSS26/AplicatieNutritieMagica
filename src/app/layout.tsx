@@ -8,7 +8,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space" });
 
 export const metadata: Metadata = {
-  title: "Queen&King Cardio | Performanță & Nutriție AI",
+  // Am modificat titlul aici:
+  title: "Queen&King Fit | Performanță & Nutriție AI",
   description: "Monitorizează-ți caloriile.",
 };
 

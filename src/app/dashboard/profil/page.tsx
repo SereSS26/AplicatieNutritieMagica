@@ -6,6 +6,8 @@ import {
   User, Target, Utensils, Dumbbell, Save, 
   Flame, Droplet, Ruler, Weight, Activity, Heart, CheckCircle2, Zap, Sparkles, BrainCircuit
 } from 'lucide-react';
+// Importăm Supabase pentru a salva datele real în baza de date!
+import { supabase } from '@/src/lib/supabase';
 
 const FOOD_PREFERENCES = [
   'Pui', 'Vită', 'Pește', 'Fructe de mare', 'Ouă', 'Lactate', 
@@ -43,11 +45,38 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isAiCalculating, setIsAiCalculating] = useState(false);
 
+  // PRELUĂM DATELE DIN BAZA DE DATE LA ÎNCĂRCARE
   useEffect(() => {
-    const savedProfile = localStorage.getItem('userProfileData');
-    if (savedProfile) {
-      setProfileData(JSON.parse(savedProfile));
-    }
+    const fetchProfile = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        let dbData = {};
+        if (session?.user) {
+          const userMeta = session.user.user_metadata || {};
+          const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+          
+          dbData = {
+            gender: userMeta.gender ?? profile?.gender ?? '',
+            age: userMeta.age ?? profile?.age ?? '',
+            height: userMeta.height ?? profile?.height ?? '',
+            weight: userMeta.weight ?? profile?.current_weight ?? profile?.weight ?? '',
+            goal: userMeta.goal ?? profile?.goal ?? 'slăbire',
+            targetCaloriesIntake: userMeta.calorie_goal ?? '',
+          };
+        }
+
+        // Le combinăm cu ce a mai salvat în LocalStorage (pentru preferințele vizuale)
+        const savedProfile = localStorage.getItem('userProfileData');
+        const localData = savedProfile ? JSON.parse(savedProfile) : {};
+
+        setProfileData(prev => ({ ...prev, ...localData, ...dbData }));
+      } catch (error) {
+        console.error("Eroare la preluarea profilului:", error);
+      }
+    };
+    
+    fetchProfile();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,19 +99,62 @@ export default function ProfilePage() {
     });
   };
 
+  // FUNCȚIA DE SALVARE (TRIMITE CĂTRE SUPABASE)
   const handleSave = async () => {
     setIsSaving(true);
-    localStorage.setItem('userProfileData', JSON.stringify(profileData));
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
-    setIsSaving(false);
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 3000);
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        // 1. Salvăm în metadatele utilizatorului pentru acces ultra-rapid
+        await supabase.auth.updateUser({
+          data: {
+            gender: profileData.gender,
+            age: profileData.age,
+            height: profileData.height,
+            weight: profileData.weight,
+            goal: profileData.goal,
+            calorie_goal: profileData.targetCaloriesIntake,
+          }
+        });
+
+        // 2. Salvăm și în tabelul `profiles`
+        await supabase.from('profiles').upsert({
+          id: session.user.id,
+          gender: profileData.gender,
+          age: parseInt(profileData.age) || null,
+          height: parseFloat(profileData.height) || null,
+          weight: parseFloat(profileData.weight) || null,
+          current_weight: parseFloat(profileData.weight) || null,
+          goal: profileData.goal,
+          updated_at: new Date().toISOString(),
+        });
+      }
+
+      // 3. Păstrăm și salvarea locală pentru UI
+      localStorage.setItem('userProfileData', JSON.stringify(profileData));
+      
+      setIsSaving(false);
+      setSaveSuccess(true);
+      
+      // Forțăm reload pentru actualizarea dashboard-ului
+      setTimeout(() => {
+        setSaveSuccess(false);
+        window.location.reload(); 
+      }, 1000);
+
+    } catch (error) {
+      console.error("Eroare la salvare:", error);
+      setIsSaving(false);
+      alert("A apărut o eroare la salvarea profilului!");
+    }
   };
 
   // --- CALCUL BMI ȘI STATUS ---
   const calculateBMI = () => {
     const w = parseFloat(profileData.weight);
-    const h = parseFloat(profileData.height) / 100; // convertim in metri
+    const h = parseFloat(profileData.height) / 100;
     if (w > 0 && h > 0) {
       const bmi = w / (h * h);
       let status = '';
@@ -111,29 +183,24 @@ export default function ProfilePage() {
 
     setIsAiCalculating(true);
 
-    // Simulam un timp scurt de procesare "grea" pentru efect
     await new Promise(resolve => setTimeout(resolve, 1500));
 
-    // BMR (Mifflin-St Jeor)
     let bmr = (10 * w) + (6.25 * h) - (5 * a);
     bmr += gender === 'bărbat' ? 5 : -161;
 
-    // TDEE (Nivel activitate mediu)
     let tdee = bmr * 1.375;
     
     let intake = tdee;
     let burn = 300;
 
-    // Ajustare în funcție de obiectiv
     if (goal === 'slăbire') {
-      intake = tdee - 500; // Deficit
-      burn = 500;          // Ardere crescută
+      intake = tdee - 500; 
+      burn = 500;          
     } else if (goal === 'masă musculară') {
-      intake = tdee + 350; // Surplus
-      burn = 250;          // Evitam arderea excesiva de muschi
+      intake = tdee + 350; 
+      burn = 250;          
     }
 
-    // Calcul Apă: 35ml per kg corp. 1 pahar = 250ml
     const waterLiters = w * 0.035;
     const waterGlasses = Math.round((waterLiters * 1000) / 250);
 
@@ -171,7 +238,6 @@ export default function ProfilePage() {
 
       <div className="max-w-6xl mx-auto relative z-10 flex flex-col gap-10 pb-16">
         
-        {/* ── HEADER SPECTACULOS ── */}
         <motion.header
           initial={{ opacity: 0, y: -30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative rounded-[32px] p-[1px] bg-gradient-to-b from-white/10 via-white/5 to-transparent shadow-2xl overflow-hidden group"
@@ -185,8 +251,9 @@ export default function ProfilePage() {
                 <span className="w-2 h-2 rounded-full bg-fuchsia-500 animate-pulse shadow-[0_0_12px_#d946ef]" />
                 <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]">Setări Cont Premium</span>
               </div>
+              {/* FIXUL E AICI: pr-2 adăugat pe span */}
               <h1 className="text-4xl lg:text-6xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-400">
-                Profilul <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-fuchsia-400 to-indigo-500 drop-shadow-[0_0_30px_rgba(217,70,239,0.3)]">Meu</span>
+                Profilul <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-fuchsia-400 to-indigo-500 drop-shadow-[0_0_30px_rgba(217,70,239,0.3)] pr-2">Meu</span>
               </h1>
             </div>
             
@@ -208,10 +275,8 @@ export default function ProfilePage() {
 
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-          {/* ── COLOANA STÂNGĂ ── */}
           <div className="lg:col-span-4 flex flex-col gap-8">
             
-            {/* WIDGET: Date Biometrice */}
             <motion.div variants={itemVariants} className="group relative rounded-[32px] p-[1px] bg-gradient-to-b from-blue-500/20 to-transparent hover:from-blue-500/40 transition-all duration-500 hover:-translate-y-1 shadow-2xl">
               <div className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-3xl rounded-[32px]" />
               <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full pointer-events-none transition-opacity group-hover:opacity-100 opacity-40" />
@@ -258,7 +323,6 @@ export default function ProfilePage() {
                       <input type="number" name="weight" value={profileData.weight} onChange={handleInputChange}
                         className={`bg-transparent text-5xl font-black text-white outline-none placeholder:text-gray-800 w-32 ${noArrowsClass}`} placeholder="0.0" />
                     </div>
-                    {/* BMI LIVE BADGE */}
                     <div className="flex flex-col items-end">
                       <span className="text-xs font-black text-gray-500 tracking-widest uppercase mb-1">BMI Live</span>
                       {bmiData ? (
@@ -275,7 +339,6 @@ export default function ProfilePage() {
               </div>
             </motion.div>
 
-            {/* WIDGET: Direcția Mea (Goal) */}
             <motion.div variants={itemVariants} className="group relative rounded-[32px] p-[1px] bg-gradient-to-b from-emerald-500/20 to-transparent hover:from-emerald-500/40 transition-all duration-500 hover:-translate-y-1 shadow-2xl">
               <div className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-3xl rounded-[32px]" />
               <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-600/10 blur-[100px] rounded-full pointer-events-none transition-opacity group-hover:opacity-100 opacity-40" />
@@ -325,11 +388,9 @@ export default function ProfilePage() {
             </motion.div>
           </div>
 
-          {/* ── COLOANA DREAPTĂ (ȚINTE SUPREME AI) ── */}
           <div className="lg:col-span-8 flex flex-col gap-8">
 
             <motion.div variants={itemVariants} className="group relative rounded-[32px] p-[2px] overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-              {/* Animated Glowing Border */}
               <div className={`absolute inset-0 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-500 transition-opacity duration-700 animate-[spin_4s_linear_infinite] ${isAiCalculating ? 'opacity-100 blur-xl' : 'opacity-30 group-hover:opacity-100 blur-md'}`} />
               <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-500 rounded-[32px]" />
               
@@ -349,7 +410,6 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  {/* BUTON MAGIC AI */}
                   <button onClick={calculateTargetsAI} disabled={isAiCalculating}
                     className="relative group/ai overflow-hidden rounded-xl p-[1px] shrink-0 active:scale-95 transition-all">
                     <span className="absolute inset-0 bg-gradient-to-r from-fuchsia-600 to-cyan-600 rounded-xl animate-pulse" />
@@ -365,7 +425,6 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
                   
-                  {/* Card 1: COMBUSTIBIL 🍔⚡ */}
                   <motion.div whileHover={{ y: -10, scale: 1.02 }} transition={{ type: "spring", stiffness: 200 }} className="relative p-[1px] rounded-[28px] overflow-hidden group/card bg-gradient-to-b from-fuchsia-500/30 to-transparent">
                     <div className={`absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-xl rounded-[28px] transition-colors duration-500 ${isAiCalculating ? 'bg-fuchsia-900/40 animate-pulse' : 'group-hover/card:bg-fuchsia-950/20'}`} />
                     <div className="relative p-6 flex flex-col items-center justify-center text-center h-full">
@@ -383,7 +442,6 @@ export default function ProfilePage() {
                     </div>
                   </motion.div>
 
-                  {/* Card 2: ARDERE 🔥☄️ */}
                   <motion.div whileHover={{ y: -10, scale: 1.02 }} transition={{ type: "spring", stiffness: 200 }} className="relative p-[1px] rounded-[28px] overflow-hidden group/card bg-gradient-to-b from-orange-500/30 to-transparent">
                     <div className={`absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-xl rounded-[28px] transition-colors duration-500 ${isAiCalculating ? 'bg-orange-900/40 animate-pulse' : 'group-hover/card:bg-orange-950/20'}`} />
                     <div className="relative p-6 flex flex-col items-center justify-center text-center h-full">
@@ -401,7 +459,6 @@ export default function ProfilePage() {
                     </div>
                   </motion.div>
 
-                  {/* Card 3: HIDRATARE 🌊🧊 */}
                   <motion.div whileHover={{ y: -10, scale: 1.02 }} transition={{ type: "spring", stiffness: 200 }} className="relative p-[1px] rounded-[28px] overflow-hidden group/card bg-gradient-to-b from-cyan-500/30 to-transparent">
                     <div className={`absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-xl rounded-[28px] transition-colors duration-500 ${isAiCalculating ? 'bg-cyan-900/40 animate-pulse' : 'group-hover/card:bg-cyan-950/20'}`} />
                     <div className="relative p-6 flex flex-col items-center justify-center text-center h-full">
@@ -423,7 +480,6 @@ export default function ProfilePage() {
               </div>
             </motion.div>
 
-            {/* WIDGET: Preferințe Alimentare */}
             <motion.div variants={itemVariants} className="group relative rounded-[32px] p-[1px] bg-gradient-to-b from-yellow-500/20 to-transparent hover:from-yellow-500/40 transition-all duration-500 hover:-translate-y-1 shadow-2xl mt-4">
               <div className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-3xl rounded-[32px]" />
               
@@ -456,7 +512,6 @@ export default function ProfilePage() {
               </div>
             </motion.div>
 
-            {/* WIDGET: Preferințe Antrenamente */}
             <motion.div variants={itemVariants} className="group relative rounded-[32px] p-[1px] bg-gradient-to-b from-purple-500/20 to-transparent hover:from-purple-500/40 transition-all duration-500 hover:-translate-y-1 shadow-2xl">
               <div className="absolute inset-0 bg-[#0a0a0a]/90 backdrop-blur-3xl rounded-[32px]" />
               

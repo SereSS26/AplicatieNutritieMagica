@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Crown } from 'lucide-react';
 import AuthModal from './AuthModal';
 import { useAuth } from '@/src/hooks/useAuth';
 
@@ -46,25 +46,45 @@ export default function HeroSection() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 w-fit mb-8 backdrop-blur-sm"
         >
           <span className="flex h-2 w-2 rounded-full bg-fuchsia-600 animate-pulse"></span>
-          <span className="text-xs font-semibold tracking-wider text-gray-300 uppercase">ITEC Hackathon 2026</span>
+          <span className="text-xs font-semibold tracking-wider text-gray-300 uppercase">ITFEST Hackathon 2026</span>
         </motion.div>
 
         <motion.h1
           variants={itemVariants}
-          className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tighter leading-[0.95] mb-6 text-white"
+          className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter leading-tight mb-6 text-white"
         >
-          Corp <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-600 to-purple-400">
-            Nefiltrat.
+          Claim your <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-600 to-purple-400 pr-2">
+          Crown.
           </span>
         </motion.h1>
 
-        <motion.p
+        {/* PANEL PREMIUM PENTRU SUB-TEXT */}
+        <motion.div
           variants={itemVariants}
-          className="text-gray-400 text-lg leading-relaxed max-w-md mb-10 font-light"
+          className="mt-2 mb-10 flex items-start gap-4 bg-white/5 backdrop-blur-md border border-white/10 p-5 rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.3)] relative overflow-hidden group/panel transition-all hover:border-fuchsia-500/30 max-w-lg"
         >
-          Algoritmi AI care îți mapează metabolismul. Nutriție calculată la gram. Rezultate imposibil de ignorat.
-        </motion.p>
+          {/* Glow subtil la hover */}
+          <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-500/10 to-transparent pointer-events-none opacity-50 group-hover/panel:opacity-100 transition-opacity" />
+          
+          {/* Iconița de Coroană Regală */}
+          <div className="bg-fuchsia-500/20 p-2.5 rounded-xl border border-fuchsia-500/30 shrink-0 relative z-10 shadow-[inset_0_0_15px_rgba(217,70,239,0.2)]">
+            <Crown size={20} className="text-fuchsia-400" />
+          </div>
+          
+          {/* Textul adaptat în Română cu vibe de lux */}
+          <div className="text-gray-300 font-medium text-sm sm:text-base leading-relaxed relative z-10">
+            <p>
+              Algoritmi AI care îți mapează <span className="text-white font-bold text-shadow-sm">metabolismul</span>. 
+              Nutriție calculată precis la <span className="text-white font-bold text-shadow-sm">gram</span>. 
+            </p>
+            <div className="mt-2">
+              <span className="inline-block text-fuchsia-400 font-black uppercase tracking-[0.15em] text-[10px] bg-fuchsia-500/10 px-2.5 py-1 rounded-lg border border-fuchsia-500/20 shadow-[0_0_15px_rgba(217,70,239,0.3)]">
+                Rezultate imposibil de ignorat
+              </span>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Container pentru butoane, setat cu z-20 pentru a putea fi apăsate peste fundalul 3D */}
         <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4 relative z-20">

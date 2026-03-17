@@ -79,11 +79,7 @@ function calculatePoseConfidence(landmarks: PoseLandmark[], keyIndices: number[]
  * Prevents faulty detections from affecting results
  */
 function validatePose(keypoints: ReturnType<typeof extractSquatKeypoints>): boolean {
-<<<<<<< HEAD
   const { leftKnee, leftHip, leftAnkle, rightAnkle } = keypoints;
-=======
-  const { leftKnee, rightKnee, leftHip, rightHip, leftAnkle, rightAnkle } = keypoints;
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
   // Check that feet are roughly on same level (standing on ground)
   const footDiff = Math.abs(leftAnkle.y - rightAnkle.y);
@@ -97,12 +93,7 @@ function validatePose(keypoints: ReturnType<typeof extractSquatKeypoints>): bool
   if (leftHipY > leftAnkleY || leftHipY < leftKneeY) return false; // Hip-knee-ankle not aligned vertically
 
   return true;
-<<<<<<< HEAD
   }
-=======
-}
-
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 export class MovementAnalyzer {
   private referenceFrames: PoseFrame[] = [];
   private userFrames: PoseFrame[] = [];
@@ -218,11 +209,7 @@ export class MovementAnalyzer {
   }
 
   private detectSquatPhases(frames: PoseFrame[]): MovementPhase[] {
-<<<<<<< HEAD
     const metrics: SquatMetrics[] = [];
-=======
-    let metrics: SquatMetrics[] = [];
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
     // Calculate and filter valid metrics
     for (const frame of frames) {
@@ -290,11 +277,7 @@ export class MovementAnalyzer {
   }
 
   private scoreSquatQuality(frames: PoseFrame[]): { score: number; issues: string[] } {
-<<<<<<< HEAD
     const metrics: SquatMetrics[] = [];
-=======
-    let metrics: SquatMetrics[] = [];
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
     for (const frame of frames) {
       const metric = this.calculateSquatMetrics(frame);
@@ -313,10 +296,6 @@ export class MovementAnalyzer {
     // KNEE ANGLE ANALYSIS
     const kneeAngles = metrics.map((m) => m.kneeAngle.average);
     const minKneeAngle = Math.min(...kneeAngles);
-<<<<<<< HEAD
-=======
-    const avgKneeAngle = kneeAngles.reduce((a, b) => a + b, 0) / kneeAngles.length;
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
     const kneeRange = Math.max(...kneeAngles) - minKneeAngle;
 
     // Ideal range: 80-100° at bottom
@@ -486,11 +465,7 @@ export class MovementAnalyzer {
     const similarity = this.calculateSimilarity(this.userFrames, this.referenceFrames);
 
     // Calculate valid metrics
-<<<<<<< HEAD
     const validMetrics: SquatMetrics[] = [];
-=======
-    let validMetrics: SquatMetrics[] = [];
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
     for (const frame of this.userFrames) {
       const metric = this.calculateSquatMetrics(frame);
       if (metric && metric.confidence > 0.7) {
@@ -498,19 +473,12 @@ export class MovementAnalyzer {
       }
     }
 
-<<<<<<< HEAD
     const avgMetrics: Partial<SquatMetrics> = validMetrics.length > 0 ? {
       kneeAngle: {
         left: 0,
         right: 0,
         average: validMetrics.reduce((sum, m) => sum + m.kneeAngle.average, 0) / validMetrics.length,
       },
-=======
-    const avgMetrics = validMetrics.length > 0 ? {
-      kneeAngle: {
-        average: validMetrics.reduce((sum, m) => sum + m.kneeAngle.average, 0) / validMetrics.length,
-      } as any,
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
       depth: validMetrics.reduce((sum, m) => sum + m.depth, 0) / validMetrics.length,
       torsoAlignment: validMetrics.reduce((sum, m) => sum + m.torsoAlignment, 0) / validMetrics.length,
       symmetry: validMetrics.reduce((sum, m) => sum + m.symmetry, 0) / validMetrics.length,

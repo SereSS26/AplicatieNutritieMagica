@@ -27,12 +27,8 @@ const PoseEstimationCanvas = ({ onAccuracyChange, trainerVideoRef }: Props) => {
   const poseLandmarkerRef = useRef<PoseLandmarker | null>(null);
   const lastVideoTimeRef = useRef(-1);
   const lastScoreUpdateRef = useRef(0);
-<<<<<<< HEAD
   const smoothedScoreRef = useRef<number>(0);
   const sessionStartTimeRef = useRef<number | null>(null);
-=======
-  const scoreAccumulatorRef = useRef<number[]>([]);
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +104,6 @@ const PoseEstimationCanvas = ({ onAccuracyChange, trainerVideoRef }: Props) => {
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-<<<<<<< HEAD
       if (results.landmarks && results.landmarks.length > 0) {
         const landmarks = results.landmarks[0];
 
@@ -118,22 +113,11 @@ const PoseEstimationCanvas = ({ onAccuracyChange, trainerVideoRef }: Props) => {
         canvasCtx.translate(canvasElement.width, 0);
         canvasCtx.scale(-1, 1);
         
-=======
-      let currentFrameScore = 0;
-
-      if (results.landmarks && results.landmarks.length > 0) {
-        const landmarks = results.landmarks[0];
-
-        // 1. Desenăm scheletul standard
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
         for (const landmark of results.landmarks) {
           drawingUtils.drawLandmarks(landmark, { radius: (data) => DrawingUtils.lerp(data.from!.z, -0.15, 0.1, 5, 1), color: '#d946ef' });
           drawingUtils.drawConnectors(landmark, PoseLandmarker.POSE_CONNECTIONS, { color: '#FFFFFF', lineWidth: 2 });
         }
-<<<<<<< HEAD
         canvasCtx.restore(); // Revenim la coordonate normale! Textul se va vedea perfect!
-=======
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
         // Calculăm unghiurile utilizatorului
         const leftArmAngle = calculateAngle(landmarks[11], landmarks[13], landmarks[15]);
@@ -144,7 +128,6 @@ const PoseEstimationCanvas = ({ onAccuracyChange, trainerVideoRef }: Props) => {
         // --- LOGICA DE SCORING ---
         
         // CAZUL A: Avem video cu antrenorul (COMPARARE DIRECTĂ)
-<<<<<<< HEAD
         if (trainerVideoRef?.current) {
           let currentFrameScore = 0;
           if (trainerResults && trainerResults.landmarks && trainerResults.landmarks.length > 0) {
@@ -380,72 +363,6 @@ const PoseEstimationCanvas = ({ onAccuracyChange, trainerVideoRef }: Props) => {
         }
 
         onAccuracyChange(Math.floor(finalScore));
-=======
-        if (trainerResults && trainerResults.landmarks && trainerResults.landmarks.length > 0) {
-          const trainerLandmarks = trainerResults.landmarks[0];
-          
-          // Unghiuri Antrenor
-          const tLeftArm = calculateAngle(trainerLandmarks[11], trainerLandmarks[13], trainerLandmarks[15]);
-          const tRightArm = calculateAngle(trainerLandmarks[12], trainerLandmarks[14], trainerLandmarks[16]);
-          const tLeftLeg = calculateAngle(trainerLandmarks[23], trainerLandmarks[25], trainerLandmarks[27]);
-          const tRightLeg = calculateAngle(trainerLandmarks[24], trainerLandmarks[26], trainerLandmarks[28]);
-
-          // Calculăm diferența (Eroarea)
-          const diff = (
-            Math.abs(leftArmAngle - tLeftArm) +
-            Math.abs(rightArmAngle - tRightArm) +
-            Math.abs(leftLegAngle - tLeftLeg) +
-            Math.abs(rightLegAngle - tRightLeg)
-          ) / 4;
-
-          // Scorul este 100 minus eroarea medie
-          // Dacă diferența e mică, scorul e mare.
-          currentFrameScore = Math.max(0, 100 - diff);
-
-          // Desenăm un indicator vizual "MATCH" dacă ești sincronizat
-          if (currentFrameScore > 85) {
-            canvasCtx.fillStyle = "#4ade80"; // Verde
-            canvasCtx.fillText("PERFECT MATCH!", 50, 50);
-          }
-        } 
-        // CAZUL B: Nu avem video local (YouTube) -> Rămânem pe Biomecanică Generală
-        else {
-           // 3. Desenăm unghiurile pe ecran (HUD)
-        canvasCtx.fillStyle = "white";
-        canvasCtx.font = "bold 20px Arial";
-        
-        // Afișăm unghiurile lângă articulații
-        canvasCtx.fillText(`${leftArmAngle}°`, landmarks[13].x * canvasElement.width + 10, landmarks[13].y * canvasElement.height);
-        canvasCtx.fillText(`${rightArmAngle}°`, landmarks[14].x * canvasElement.width - 40, landmarks[14].y * canvasElement.height);
-        
-        // Colorăm unghiurile picioarelor în funcție de adâncime (verde dacă e squat bun)
-        canvasCtx.fillStyle = leftLegAngle < 100 ? "#4ade80" : "white"; // Verde dacă e sub 100 grade
-        canvasCtx.fillText(`${leftLegAngle}°`, landmarks[25].x * canvasElement.width + 10, landmarks[25].y * canvasElement.height);
-        
-        canvasCtx.fillStyle = rightLegAngle < 100 ? "#4ade80" : "white";
-        canvasCtx.fillText(`${rightLegAngle}°`, landmarks[26].x * canvasElement.width - 40, landmarks[26].y * canvasElement.height);
-
-        const symmetryScore = 100 - Math.abs(leftArmAngle - rightArmAngle) - Math.abs(leftLegAngle - rightLegAngle);
-        const intensityScore = (
-          (180 - leftArmAngle) + 
-          (180 - rightArmAngle) + 
-          (180 - leftLegAngle) + 
-          (180 - rightLegAngle)
-        ) / 4; // Media flexiei
-
-        currentFrameScore = Math.min(Math.max((symmetryScore * 0.4) + (intensityScore * 0.8), 10), 100);
-        }
-      }
-
-      // --- STABILIZARE SCOR ---
-      scoreAccumulatorRef.current.push(currentFrameScore);
-      const now = performance.now();
-
-      if (now - lastScoreUpdateRef.current > 300) {
-        const avgScore = scoreAccumulatorRef.current.reduce((a, b) => a + b, 0) / (scoreAccumulatorRef.current.length || 1);
-        onAccuracyChange(Math.floor(avgScore));
-        scoreAccumulatorRef.current = [];
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
         lastScoreUpdateRef.current = now;
       }
 
@@ -472,17 +389,9 @@ const PoseEstimationCanvas = ({ onAccuracyChange, trainerVideoRef }: Props) => {
         mirrored={true}
         onUserMedia={handleUserMedia} 
       />
-<<<<<<< HEAD
       <canvas ref={canvasRef} className="w-full h-full object-cover absolute z-10" />
-=======
-      <canvas ref={canvasRef} className="w-full h-full object-cover transform scale-x-[-1] absolute z-10" />
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
     </div>
   );
 };
 
-<<<<<<< HEAD
 export default PoseEstimationCanvas;
-=======
-export default PoseEstimationCanvas;
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf

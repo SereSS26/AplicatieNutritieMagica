@@ -24,3 +24,22 @@ export type Meal = {
     date?: string;
     created_at?: string;
   };
+
+  export interface HealthParameter {
+  nume: string;
+  valoare: string;
+  unitate: string;
+  interval_referinta: string;
+  status: 'normal' | 'scazut' | 'ridicat';
+  evolutie?: 'imbunatatire' | 'stagnare' | 'inrautatire' | 'necunoscut';
+}
+
+export interface HealthAnalysis {
+  id: string;
+  user_id: string;
+  analysis_date: string;
+  general_score: number;
+  evolution_status: 'imbunatatire' | 'stagnare' | 'inrautatire';
+  parameters_details: HealthParameter[];
+  created_at?: string;
+}

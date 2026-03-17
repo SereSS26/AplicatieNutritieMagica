@@ -16,12 +16,8 @@ export default function UserProfile() {
   // Extragem datele utilizatorului la montare
   useEffect(() => {
     const fetchUser = async () => {
-<<<<<<< HEAD
-      const { data: { session } } = await supabase.auth.getSession();
-      const user = session?.user;
-=======
       const { data: { user } } = await supabase.auth.getUser();
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
+
       if (user) {
         setUserEmail(user.email || "");
         setUserName(user.user_metadata?.full_name || "Rege");

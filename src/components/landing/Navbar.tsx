@@ -87,7 +87,7 @@ export default function Navbar() {
               <Zap className="text-white" size={20} strokeWidth={2.5} />
             </div>
             <span className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-              Queen&King<span className="text-fuchsia-600 font-light">Cardio</span>
+              Queen&King<span className="text-fuchsia-600 font-light">Fit</span>
             </span>
           </Link>
 

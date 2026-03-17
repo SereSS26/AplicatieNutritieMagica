@@ -9,13 +9,8 @@ export function useAuth() {
   useEffect(() => {
     // Luăm userul curent din Supabase
     const fetchUser = async () => {
-<<<<<<< HEAD
-      const { data: { session } } = await supabase.auth.getSession();
-      setUserId(session?.user?.id || null);
-=======
       const { data: { user } } = await supabase.auth.getUser();
       setUserId(user?.id || null);
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
     };
     
     fetchUser();

@@ -1,11 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-<<<<<<< HEAD
-export function middleware(_request: NextRequest) {
-=======
 export function middleware(request: NextRequest) {
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   // Deocamdată lăsăm tot traficul să treacă.
   // Vom adăuga protecția cu Supabase direct în pagini sau mai târziu aici.
   return NextResponse.next();

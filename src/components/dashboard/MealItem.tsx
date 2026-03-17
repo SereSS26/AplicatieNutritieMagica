@@ -1,8 +1,5 @@
 import React from 'react';
-<<<<<<< HEAD
 import { Trash2, Loader2 } from 'lucide-react';
-=======
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
 type MealItemProps = {
   time: string;
@@ -10,17 +7,11 @@ type MealItemProps = {
   cals: string;
   protein?: number; // Opțional, pentru că pe prima pagină poate nu vrem să-l afișăm
   status: 'done' | 'pending';
-<<<<<<< HEAD
   onDelete?: () => void;
   isDeleting?: boolean;
 };
 
 export default function MealItem({ time, name, cals, protein, status, onDelete, isDeleting }: MealItemProps) {
-=======
-};
-
-export default function MealItem({ time, name, cals, protein, status }: MealItemProps) {
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   return (
     <div className="flex items-center justify-between p-4 rounded-2xl bg-black/20 border border-white/5 hover:border-white/10 transition-colors group">
       <div className="flex items-center gap-4">
@@ -30,7 +21,6 @@ export default function MealItem({ time, name, cals, protein, status }: MealItem
           <p className="text-[11px] font-mono text-gray-500 mt-0.5">{time}</p>
         </div>
       </div>
-<<<<<<< HEAD
       <div className="flex items-center gap-3">
         <div className="flex flex-col items-end gap-1">
           <span className="text-sm font-black text-white">{cals}</span>
@@ -50,15 +40,6 @@ export default function MealItem({ time, name, cals, protein, status }: MealItem
             {isDeleting ? <Loader2 size={16} className="animate-spin text-red-500" /> : <Trash2 size={16} />}
           </button>
         )}
-=======
-      <div className="flex flex-col items-end gap-1">
-        <span className="text-sm font-black text-white">{cals}</span>
-        {protein && protein > 0 ? (
-          <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-md">
-            {protein}g proteine
-          </span>
-        ) : null}
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
       </div>
     </div>
   );

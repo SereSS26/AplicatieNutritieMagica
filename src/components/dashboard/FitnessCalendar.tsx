@@ -1,19 +1,11 @@
 "use client";
 
-<<<<<<< HEAD
 import React, { useState, useEffect, useCallback } from 'react';
-=======
-import React, { useState, useEffect } from 'react';
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 import { supabase } from '@/src/lib/supabase';
 import { useAuth } from '@/src/hooks/useAuth';
 import { motion, AnimatePresence } from 'framer-motion';
 // AM ADĂUGAT CheckCircle și Award din lucide-react
-<<<<<<< HEAD
 import { ChevronLeft, ChevronRight, Flame, Utensils, Droplets, Activity, X, CheckCircle, Award, Loader2 } from 'lucide-react';
-=======
-import { ChevronLeft, ChevronRight, Flame, Utensils, Droplets, Activity, X, CheckCircle, Award } from 'lucide-react';
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
 type DayStats = {
   eaten: number;
@@ -22,15 +14,12 @@ type DayStats = {
   water: number;
 };
 
-<<<<<<< HEAD
 interface LocalExercise {
   user_id: string;
   date: string;
   calories_burned: number;
 }
 
-=======
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 export default function FitnessCalendar() {
   const { userId } = useAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -38,16 +27,7 @@ export default function FitnessCalendar() {
   const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState<{ date: string; stats: DayStats } | null>(null);
 
-<<<<<<< HEAD
   const fetchMonthData = useCallback(async () => {
-=======
-  useEffect(() => {
-    if (!userId) return;
-    fetchMonthData();
-  }, [userId, currentDate]);
-
-  const fetchMonthData = async () => {
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
     if (!userId) return;
     setLoading(true);
     
@@ -67,11 +47,7 @@ export default function FitnessCalendar() {
     });
 
     const localExercises = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('demo_exercises') || '[]') : [];
-<<<<<<< HEAD
     localExercises.forEach((e: LocalExercise) => {
-=======
-    localExercises.forEach((e: any) => {
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
       if (e.user_id === userId && e.date >= startOfMonth && e.date <= endOfMonth) {
         if (!stats[e.date]) stats[e.date] = { eaten: 0, burned: 0, protein: 0, water: 0 };
         stats[e.date].burned += (e.calories_burned || 0);
@@ -90,15 +66,11 @@ export default function FitnessCalendar() {
 
     setDailyData(stats);
     setLoading(false);
-<<<<<<< HEAD
   }, [userId, currentDate]);
 
   useEffect(() => {
     fetchMonthData();
   }, [fetchMonthData]);
-=======
-  };
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate();
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
@@ -106,14 +78,10 @@ export default function FitnessCalendar() {
   return (
     <div className="bg-white/5 border border-white/10 rounded-[32px] p-6 backdrop-blur-md relative h-full flex flex-col">
       <div className="flex justify-between items-center mb-8">
-<<<<<<< HEAD
         <div className="flex items-center gap-3">
           <h3 className="text-xl font-bold italic">Calendar Activitate</h3>
           {loading && <Loader2 className="animate-spin text-fuchsia-500" size={16} />}
         </div>
-=======
-        <h3 className="text-xl font-bold italic">Calendar Activitate</h3>
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
         <div className="flex gap-2">
           <button onClick={() => setCurrentDate(new Date(currentDate.setMonth(currentDate.getMonth() - 1)))} className="p-2 hover:bg-white/10 rounded-xl transition-colors"><ChevronLeft size={20}/></button>
           <span className="font-bold min-w-[120px] text-center capitalize">

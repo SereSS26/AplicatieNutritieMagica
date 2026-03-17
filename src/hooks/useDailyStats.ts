@@ -4,20 +4,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/src/lib/supabase';
 import { Meal } from '@/src/types';
 
-<<<<<<< HEAD
 export function useDailyStats(userId: string | null | undefined, refreshProgress?: () => void) {
-=======
-export function useDailyStats(userId: string | null | undefined) {
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   const [meals, setMeals] = useState<Meal[]>([]);
   const [exercises, setExercises] = useState<any[]>([]);
   const [waterGlasses, setWaterGlasses] = useState(0);
   const [todayWorkout, setTodayWorkout] = useState("Fără antrenament");
-<<<<<<< HEAD
   const [burnedCalories, setBurnedCalories] = useState(0);
-=======
-  const [burnedCalories, setBurnedCalories] = useState(0); 
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   const [loading, setLoading] = useState(true);
   const [isSavingMeal, setIsSavingMeal] = useState(false);
   const [isSavingWater, setIsSavingWater] = useState(false);
@@ -29,11 +21,7 @@ export function useDailyStats(userId: string | null | undefined) {
     const today = new Date().toISOString().split('T')[0];
 
     try {
-<<<<<<< HEAD
       const [waterRes, mealsRes, exercisesRes] = await Promise.all([
-=======
-      const [ waterRes, mealsRes, exercisesRes ] = await Promise.all([
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
         supabase.from('daily_stats').select('water_glasses').eq('user_id', userId).eq('date', today).maybeSingle(),
         supabase.from('meals').select('*').eq('user_id', userId).eq('date', today).order('created_at', { ascending: true }),
         supabase.from('exercises').select('id, name, calories_burned').eq('user_id', userId).eq('date', today)
@@ -221,10 +209,7 @@ export function useDailyStats(userId: string | null | undefined) {
         else setTodayWorkout("Fără antrenament");
         return newExercises;
       });
-<<<<<<< HEAD
       if (refreshProgress) refreshProgress();
-=======
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
       return true;
     } catch (error) {
       return false;
@@ -285,10 +270,7 @@ export function useDailyStats(userId: string | null | undefined) {
         if (updated.length > 0) setTodayWorkout(updated[0].name);
         return updated;
       });
-<<<<<<< HEAD
       if (refreshProgress) refreshProgress();
-=======
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
       return true;
     } catch (error) {
       return false;
@@ -322,10 +304,7 @@ export function useDailyStats(userId: string | null | undefined) {
         if (updated.length > 0) setTodayWorkout(updated[0].name);
         return updated;
       });
-<<<<<<< HEAD
       if (refreshProgress) refreshProgress();
-=======
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
       return true;
     } catch (error) {
       console.error("Eroare la addExercise:", error);

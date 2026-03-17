@@ -14,21 +14,12 @@ const onboardingSchema = z.object({
   nume: z.string().min(2, "Nume prea scurt"),
   prenume: z.string().min(2, "Prenume prea scurt"),
   varsta: z.string().min(1, "Obligatoriu"),
-<<<<<<< HEAD
   sex: z.enum(["masculin", "feminin"], { message: "Selectează sexul biologic" }),
   greutate_actuala: z.string().min(1, "Obligatoriu"),
   greutate_dorita: z.string().min(1, "Obligatoriu"),
   inaltime: z.string().min(1, "Obligatoriu"),
   nivel_activitate: z.enum(["sedentar", "usor", "moderat", "foarte_activ"], { message: "Selectează nivelul de activitate" }),
   is_vegetarian: z.boolean(),
-=======
-  sex: z.enum(["masculin", "feminin"], { required_error: "Selectează sexul biologic" }),
-  greutate_actuala: z.string().min(1, "Obligatoriu"),
-  greutate_dorita: z.string().min(1, "Obligatoriu"),
-  inaltime: z.string().min(1, "Obligatoriu"),
-  nivel_activitate: z.enum(["sedentar", "usor", "moderat", "foarte_activ"], { required_error: "Selectează nivelul de activitate" }),
-  is_vegetarian: z.boolean().default(false),
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 });
 
 type OnboardingFormValues = z.infer<typeof onboardingSchema>;
@@ -52,12 +43,8 @@ export default function OnboardingPage() {
     setIsSubmitting(true);
 
     try {
-<<<<<<< HEAD
       const { data: { session }, error: authError } = await supabase.auth.getSession();
       const user = session?.user;
-=======
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
       
       if (authError || !user) {
         alert("Sesiunea a expirat. Te rugăm să te loghezi din nou.");
@@ -174,11 +161,7 @@ export default function OnboardingPage() {
                     <button 
                       type="button" 
                       key={s.value}
-<<<<<<< HEAD
                       onClick={() => setValue("sex", s.value as "masculin" | "feminin", { shouldValidate: true })}
-=======
-                      onClick={() => setValue("sex", s.value as any, { shouldValidate: true })}
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
                       className={`py-3 px-4 rounded-xl border text-sm font-bold transition-all ${selectedSex === s.value ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 border-transparent text-white shadow-lg' : 'bg-black/50 border-white/10 text-gray-400 hover:border-white/30'}`}
                     >
                       {s.label}
@@ -200,11 +183,7 @@ export default function OnboardingPage() {
                     <button
                       type="button"
                       key={act.id}
-<<<<<<< HEAD
                       onClick={() => setValue("nivel_activitate", act.id as "sedentar" | "usor" | "moderat" | "foarte_activ", { shouldValidate: true })}
-=======
-                      onClick={() => setValue("nivel_activitate", act.id as any, { shouldValidate: true })}
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
                       className={`text-left p-3 rounded-xl border transition-all ${selectedActivity === act.id ? 'bg-fuchsia-500/10 border-fuchsia-500/50' : 'bg-black/50 border-white/10 hover:border-white/20'}`}
                     >
                       <p className={`font-bold text-sm ${selectedActivity === act.id ? 'text-fuchsia-400' : 'text-gray-300'}`}>{act.label}</p>

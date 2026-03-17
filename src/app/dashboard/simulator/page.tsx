@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Flame, Clock, Activity, Zap, Info, ScanLine, RotateCcw, Loader2 } from 'lucide-react';
+import { Flame, Clock, Activity, Zap, Info, ScanLine, RotateCcw, Loader2, Sparkles } from 'lucide-react';
 import { supabase } from '@/src/lib/supabase';
 
 export default function TimeMachineSimulator() {
@@ -29,7 +29,7 @@ export default function TimeMachineSimulator() {
           .from('profiles')
           .select('*')
           .eq('id', session.user.id)
-          .maybeSingle(); // Previne erorile stricte dacă nu există profilul sau sunt mai multe
+          .maybeSingle();
 
         // Fallback: Dacă nu există tabelul 'profiles', încercăm automat în tabelul 'users'
         if (!profile) {
@@ -37,16 +37,12 @@ export default function TimeMachineSimulator() {
           if (fallbackProfile) profile = fallbackProfile;
         }
 
-        // Tragem Setările exact din locul în care le-ai salvat în pagina de Setări!
         const userMeta = session.user.user_metadata || {};
-        console.log("✅ Setări găsite:", userMeta);
-
-        // Căutăm în metadata, iar dacă nu e acolo, ne uităm în profil
+        
         const rawWeight = userMeta.weight ?? profile?.current_weight ?? profile?.weight ?? 75;
         const rawHeight = userMeta.height ?? profile?.height ?? 170;
         const rawAge = userMeta.age ?? profile?.age ?? 30;
         
-        // Forțăm conversia matematică ca să putem face calcule pe ele
         const weight = parseFloat(String(rawWeight)) || 75;
         const height = parseFloat(String(rawHeight)) || 170;
         const age = parseInt(String(rawAge)) || 30;
@@ -59,7 +55,7 @@ export default function TimeMachineSimulator() {
         bmr = (gender.includes('masculin') || gender === 'm') ? bmr + 5 : bmr - 161;
 
         // Calcul TDEE (Total Daily Energy Expenditure) pe baza activității
-        let multiplier = 1.2; // sedentar
+        let multiplier = 1.2; 
         if (activityLevel.includes('usor') || activityLevel.includes('ușor')) multiplier = 1.375;
         else if (activityLevel.includes('moderat')) multiplier = 1.55;
         else if (activityLevel.includes('foarte') || activityLevel.includes('activ')) multiplier = 1.725;
@@ -70,7 +66,6 @@ export default function TimeMachineSimulator() {
         setBaseBMR(bmr);
         setTdee(calculatedTdee);
         
-        // Opțional: Folosim target-ul tău de calorii pe care l-ai setat, în caz că e disponibil
         const userCalorieGoal = userMeta.calorie_goal ? parseInt(String(userMeta.calorie_goal)) : calculatedTdee;
         setCalories(userCalorieGoal); 
       } catch (error) {
@@ -118,15 +113,13 @@ export default function TimeMachineSimulator() {
     svgAura = "#22d3ee";
   }
 
-  // Reset la setările inițiale
   const handleReset = () => {
     setMonths(0);
-    setCalories(tdee); // Resetăm la menținere, nu la 2000
+    setCalories(tdee); 
     setWorkoutMins(15);
     setSugar(50);
   };
 
-  // Ecran de loading cât timp luăm datele
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#030303] flex flex-col items-center justify-center text-white pb-32">
@@ -141,10 +134,23 @@ export default function TimeMachineSimulator() {
       
       {/* Header */}
       <div className="mb-10">
+        {/* AICI ESTE FIX-UL PENTRU LITERA TĂIATĂ: pr-2 adăugat la Timpului */}
         <h1 className="text-4xl font-black italic uppercase tracking-tighter mb-2 flex items-center gap-3">
-          Mașina <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 to-blue-500">Timpului</span> <Clock size={32} className="text-blue-500" />
+          Mașina <span className="text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 to-blue-500 pr-2">Timpului</span> <Clock size={32} className="text-blue-500" />
         </h1>
-        <p className="text-gray-400">Joacă-te cu variabilele de mai jos și vezi cum va arăta corpul tău în viitor.</p>
+        
+        {/* PANELUL PREMIUM PENTRU TEXT */}
+        <div className="mt-6 flex items-start sm:items-center gap-4 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.4)] relative overflow-hidden group/panel transition-all hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(59,130,246,0.15)] w-full lg:w-3/4">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none opacity-50 group-hover/panel:opacity-100 transition-opacity" />
+          
+          <div className="bg-blue-500/20 p-2.5 rounded-xl border border-blue-500/30 shrink-0 relative z-10 shadow-[inset_0_0_15px_rgba(59,130,246,0.2)]">
+            <Sparkles size={22} className="text-blue-400" />
+          </div>
+          
+          <p className="text-gray-300 font-medium text-sm sm:text-base leading-relaxed relative z-10">
+            Joacă-te cu <span className="text-white font-bold drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">variabilele</span> de mai jos și vezi cum va arăta <span className="text-white font-bold drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">corpul tău</span> în <span className="inline-block mt-1 sm:mt-0 text-blue-400 font-black uppercase tracking-widest text-[10px] sm:text-xs sm:mx-1 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.2)]">Viitor</span>.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -318,7 +324,7 @@ export default function TimeMachineSimulator() {
           <div className="absolute bottom-6 w-full px-6 flex justify-between gap-4">
             
             <motion.div 
-              key={`weight-${projectedWeight}`} // Dă un key ca să animeze când se schimbă
+              key={`weight-${projectedWeight}`} 
               initial={{ scale: 1.1, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
               className="bg-black/80 backdrop-blur-md border border-white/10 p-4 rounded-2xl flex-1 text-center"
             >

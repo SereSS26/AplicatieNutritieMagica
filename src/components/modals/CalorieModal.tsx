@@ -2,7 +2,10 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Flame, Plus, Sparkles } from 'lucide-react';
+import { X, Flame, Plus, Sparkles, HeartPulse, Loader2 } from 'lucide-react';
+import { useAuth } from '@/src/hooks/useAuth';
+import { supabase } from '@/src/lib/supabase';
+import { HealthParameter } from '@/src/types';
 
 // Tipul de date pentru Mese
 type Meal = {
@@ -43,6 +46,31 @@ export default function CalorieModal({
   
   // Stare pentru a ști când AI-ul încarcă răspunsul
   const [isEstimating, setIsEstimating] = useState(false);
+  const [isRecommending, setIsRecommending] = useState(false);
+  const [aiExplanation, setAiExplanation] = useState('');
+  
+  const [healthAlerts, setHealthAlerts] = useState<HealthParameter[]>([]);
+  const { userId } = useAuth();
+
+  // Extragem analizele cu probleme imediat ce deschidem Jurnalul
+  React.useEffect(() => {
+    if (isOpen && userId) {
+      const fetchAlerts = async () => {
+        const { data } = await supabase
+          .from('health_analyses')
+          .select('parameters_details')
+          .eq('user_id', userId)
+          .order('analysis_date', { ascending: false })
+          .limit(1)
+          .single();
+        if (data && data.parameters_details) {
+          const bad = data.parameters_details.filter((p: any) => p.status === 'scazut' || p.status === 'ridicat');
+          setHealthAlerts(bad);
+        }
+      };
+      fetchAlerts();
+    }
+  }, [isOpen, userId]);
 
   // Funcția care apelează API-ul nostru de nutriție cu Gemini
   const estimateWithAI = async () => {
@@ -75,6 +103,37 @@ export default function CalorieModal({
     }
   };
 
+  // Funcția care generează o masă bazată pe analizele proaste
+  const generateHealthRecommendation = async () => {
+    if (!userId) {
+      alert("Trebuie să fii logat pentru a folosi această funcție.");
+      return;
+    }
+    setIsRecommending(true);
+    setAiExplanation('');
+    try {
+      const res = await fetch('/api/recommend-meal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+      if (data.success && data.meal) {
+        setNewMealName(data.meal.name);
+        setNewMealCalories(data.meal.calories.toString());
+        setNewMealProtein(data.meal.protein.toString());
+        setAiExplanation(data.meal.explanation);
+      } else {
+        alert('Eroare la generare: ' + data.error);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('A apărut o eroare de conexiune cu AI-ul medical.');
+    } finally {
+      setIsRecommending(false);
+    }
+  };
+
   // Dacă modalul nu este deschis, nu afișăm nimic
   if (!isOpen) return null;
 
@@ -99,6 +158,25 @@ export default function CalorieModal({
           Jurnal Alimentar
         </h2>
         <p className="text-gray-400 text-sm mb-6">Adaugă mesele manual sau folosește AI-ul pentru a le estima.</p>
+
+        {/* BANNERE MEDICALE AUTOMATE - BAZATE PE ANALIZE */}
+        {healthAlerts.length > 0 && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex flex-col gap-2 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+            <span className="flex items-center gap-2 text-red-400 font-black text-xs uppercase tracking-widest">
+              <HeartPulse size={14} className="animate-pulse" /> Profil Medical Activ
+            </span>
+            <p className="text-gray-300 text-xs font-medium leading-relaxed">
+              AI-ul va evita automat alimentele dăunătoare și va adapta sugestiile pentru:
+            </p>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {healthAlerts.map((param, i) => (
+                <span key={i} className={`text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider ${param.status === 'ridicat' ? 'bg-red-500/20 text-red-400 border border-red-500/20' : 'bg-blue-500/20 text-blue-400 border border-blue-500/20'}`}>
+                  {param.nume}: {param.status === 'ridicat' ? '↑ Ridicat' : '↓ Scăzut'}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* FORMULAR ADĂUGARE MASĂ */}
         <form onSubmit={handleAddMeal} className="flex flex-col gap-3 mb-6">
@@ -150,6 +228,28 @@ export default function CalorieModal({
             </button>
           </div>
         </form>
+
+        {/* Buton Nou - Recomandare bazată pe Analize */}
+        <div className="mb-6 flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={generateHealthRecommendation}
+            disabled={isRecommending || isSavingMeal}
+            className="w-full bg-gradient-to-r from-emerald-600/20 to-teal-600/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-500/30 text-emerald-400 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50 tracking-wide text-sm shadow-[0_0_15px_rgba(16,185,129,0.1)]"
+          >
+            {isRecommending ? <Loader2 size={18} className="animate-spin" /> : <HeartPulse size={18} />}
+            {isRecommending ? 'Se analizează profilul tău de sănătate...' : 'Recomandă-mi o masă pentru a-mi regla analizele'}
+          </button>
+
+          {aiExplanation && (
+            <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-100 text-sm shadow-[0_0_15px_rgba(16,185,129,0.1)] leading-relaxed">
+              <span className="font-black text-emerald-400 block mb-1 flex items-center gap-2 uppercase tracking-widest text-[10px]">
+                <HeartPulse size={12} /> Recomandare Medicală AI
+              </span>
+              {aiExplanation}
+            </motion.div>
+          )}
+        </div>
 
         {/* LISTA DE MESE DE AZI */}
         <div className="space-y-3 mb-6">

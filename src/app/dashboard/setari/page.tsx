@@ -1,18 +1,16 @@
-<<<<<<< HEAD
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Settings, Lock, User, ShieldCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase'; // Asigură-te că această cale este corectă
+import { Settings, Lock, User, ShieldCheck, AlertCircle, CheckCircle2, Zap, Key } from 'lucide-react';
+import { supabase } from '@/src/lib/supabase';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SettingsPage() {
-  // Starea pentru datele utilizatorului (doar pentru afișare)
   const [userData, setUserData] = useState({
     name: 'Se încarcă...',
     email: 'Se încarcă...'
   });
 
-  // Starea pentru parola nouă
   const [passwords, setPasswords] = useState({
     newPassword: '',
     confirmPassword: ''
@@ -21,7 +19,6 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState({ type: '', text: '' });
 
-  // Încărcăm datele oficiale din Supabase când se deschide pagina
   useEffect(() => {
     const fetchUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -29,7 +26,6 @@ export default function SettingsPage() {
       if (user) {
         setUserData({
           email: user.email || 'Email indisponibil',
-          // Dacă ai setat numele la înregistrare în metadata, îl tragem de acolo
           name: user.user_metadata?.name || user.user_metadata?.full_name || 'Nume Setat'
         });
       }
@@ -38,16 +34,13 @@ export default function SettingsPage() {
     fetchUserData();
   }, []);
 
-  // Funcția de actualizare a inputurilor pentru parole
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPasswords({ ...passwords, [e.target.name]: e.target.value });
   };
 
-  // Salvarea noii parole în Supabase
   const handleSavePassword = async () => {
     setStatusMessage({ type: '', text: '' });
 
-    // Validări de bază
     if (!passwords.newPassword) {
       setStatusMessage({ type: 'error', text: 'Te rugăm să introduci o parolă nouă.' });
       return;
@@ -64,17 +57,17 @@ export default function SettingsPage() {
     setIsSaving(true);
 
     try {
-      // Aceasta este funcția Supabase care schimbă parola contului permanent!
       const { error } = await supabase.auth.updateUser({
         password: passwords.newPassword
       });
 
       if (error) throw error;
 
-      // Succes!
       setStatusMessage({ type: 'success', text: 'Parola a fost actualizată! O poți folosi la următoarea logare.' });
-      setPasswords({ newPassword: '', confirmPassword: '' }); // Golim câmpurile
+      setPasswords({ newPassword: '', confirmPassword: '' }); 
       
+      // Ștergem mesajul de succes după 5 secunde
+      setTimeout(() => setStatusMessage({ type: '', text: '' }), 5000);
     } catch (error: any) {
       console.error('Eroare la schimbarea parolei:', error);
       setStatusMessage({ type: 'error', text: 'A apărut o eroare. Parola nu a putut fi schimbată.' });
@@ -84,357 +77,181 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen p-6 text-white">
-      <div className="max-w-3xl mx-auto space-y-8">
+    <div className="min-h-screen p-4 md:p-6 lg:p-10 text-white relative z-10 overflow-hidden custom-scrollbar">
+      
+      {/* Lumini atmosferice de fundal */}
+      <div className="absolute top-[10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-fuchsia-600/10 rounded-full blur-[120px] pointer-events-none -z-10" />
+
+      <div className="max-w-4xl mx-auto space-y-8 relative z-10 pb-20">
         
-        {/* Header-ul paginii */}
-        <div>
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Settings className="text-blue-500" size={32} />
-            Setări Cont
-          </h1>
-          <p className="text-gray-400 mt-2">
-            Aici poți vedea datele contului tău și poți actualiza parola de acces.
-          </p>
-        </div>
-
-        {/* Mesaje de Succes sau Eroare */}
-        {statusMessage.text && (
-          <div className={`p-4 rounded-xl flex items-center gap-3 border ${
-            statusMessage.type === 'success' ? 'bg-green-900/30 border-green-500 text-green-400' : 'bg-red-900/30 border-red-500 text-red-400'
-          }`}>
-            {statusMessage.type === 'success' ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
-            <span className="font-medium">{statusMessage.text}</span>
-          </div>
-        )}
-
-        {/* SECȚIUNEA 1: Informații Personale (BLOCATE / FIXE) */}
-        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 space-y-6 shadow-lg opacity-80">
-          <h2 className="text-xl font-semibold flex items-center gap-2 text-white border-b border-gray-700 pb-4">
-            <User size={20} className="text-blue-400" />
-            Detalii Cont (Fixe)
-          </h2>
+        {/* ── HEADER SPECTACULOS ── */}
+        <motion.header
+          initial={{ opacity: 0, y: -20 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="relative rounded-[32px] p-[1px] bg-gradient-to-b from-white/10 via-white/5 to-transparent shadow-2xl overflow-hidden group"
+        >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-3xl" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full pointer-events-none transition-opacity duration-500 group-hover:opacity-100 opacity-60" />
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-50" />
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Nume Utilizator</label>
-              <input 
-                type="text" 
-                value={userData.name} 
-                disabled
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-gray-400 cursor-not-allowed outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-400 mb-2">Adresă de Email</label>
-              <input 
-                type="email" 
-                value={userData.email} 
-                disabled
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-gray-400 cursor-not-allowed outline-none"
-              />
+          <div className="relative p-8 lg:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+            <div className="relative z-10 w-full max-w-2xl">
+              <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_12px_#3b82f6]" />
+                <span className="text-[10px] font-black text-gray-300 uppercase tracking-[0.25em]">Sistem de Control</span>
+              </div>
+              
+              {/* Titlul reparat cu pr-2 pentru a nu tăia litera "t" */}
+              <h1 className="text-4xl lg:text-5xl font-black italic tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-100 to-gray-400">
+                Setări <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-500 drop-shadow-[0_0_30px_rgba(59,130,246,0.3)] pr-2">Cont</span>
+              </h1>
+              
+              <div className="mt-6 flex items-start sm:items-center gap-4 bg-gradient-to-r from-white/10 to-white/5 backdrop-blur-md border border-white/10 p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.4)] relative overflow-hidden group/panel transition-all hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(59,130,246,0.15)]">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent pointer-events-none opacity-50 group-hover/panel:opacity-100 transition-opacity" />
+                <div className="bg-blue-500/20 p-2.5 rounded-xl border border-blue-500/30 shrink-0 relative z-10 shadow-[inset_0_0_15px_rgba(59,130,246,0.2)]">
+                  <Settings size={22} className="text-blue-400 animate-[spin_4s_linear_infinite]" />
+                </div>
+                <p className="text-gray-300 font-medium text-sm sm:text-base leading-relaxed relative z-10">
+                  Aici poți vedea datele contului tău și poți actualiza <span className="text-white font-bold drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]">parola de acces</span>. Păstrează-ți contul în <span className="inline-block mt-1 sm:mt-0 text-blue-400 font-black uppercase tracking-widest text-[10px] sm:text-xs sm:mx-1 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.2)]">Siguranță</span>.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.header>
 
-        {/* SECȚIUNEA 2: Securitate și Parolă */}
-        <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 space-y-6 shadow-lg">
-          <h2 className="text-xl font-semibold flex items-center gap-2 text-white border-b border-gray-700 pb-4">
-            <Lock size={20} className="text-red-400" />
-            Schimbă Parola
-          </h2>
-          
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Parolă Nouă</label>
+        {/* ── ALERTE ȘI MESAJE ── */}
+        <AnimatePresence>
+          {statusMessage.text && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10, scale: 0.95 }} 
+              animate={{ opacity: 1, y: 0, scale: 1 }} 
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              className={`p-5 rounded-2xl flex items-center gap-4 border backdrop-blur-md shadow-2xl relative overflow-hidden ${
+              statusMessage.type === 'success' 
+                ? 'bg-emerald-900/20 border-emerald-500/40 text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.15)]' 
+                : 'bg-red-900/20 border-red-500/40 text-red-400 shadow-[0_0_30px_rgba(239,68,68,0.15)]'
+            }`}>
+              <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent pointer-events-none" />
+              <div className={`p-2 rounded-full ${statusMessage.type === 'success' ? 'bg-emerald-500/20' : 'bg-red-500/20'} relative z-10 shrink-0`}>
+                {statusMessage.type === 'success' ? <CheckCircle2 size={24} /> : <AlertCircle size={24} />}
+              </div>
+              <span className="font-bold relative z-10">{statusMessage.text}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
+          className="grid grid-cols-1 gap-8"
+        >
+          {/* ── SECȚIUNEA 1: Informații Personale (FIXE) ── */}
+          <div className="bg-[#0a0a0a]/60 backdrop-blur-3xl p-8 rounded-[32px] border border-white/5 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-600/5 blur-[100px] rounded-full pointer-events-none group-hover:bg-cyan-600/10 transition-colors duration-700" />
+            
+            <div className="flex items-center gap-4 mb-8 border-b border-white/10 pb-6 relative z-10">
+              <div className="bg-cyan-500/10 p-3 rounded-2xl border border-cyan-500/20 shadow-[inset_0_0_20px_rgba(34,211,238,0.1)]">
+                <User size={24} className="text-cyan-400" />
+              </div>
+              <h2 className="text-2xl font-black italic text-white tracking-wide">Identitate Vizuală</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col gap-2">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                  <Zap size={14} className="text-gray-400" /> Nume Utilizator
+                </label>
+                <div className="text-lg font-bold text-white bg-black/40 px-4 py-3 rounded-xl border border-white/5 shadow-inner text-gray-300">
+                  {userData.name}
+                </div>
+              </div>
+              
+              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-5 flex flex-col gap-2">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                  <User size={14} className="text-gray-400" /> Adresă de Email
+                </label>
+                <div className="text-lg font-bold text-white bg-black/40 px-4 py-3 rounded-xl border border-white/5 shadow-inner text-gray-300">
+                  {userData.email}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── SECȚIUNEA 2: Securitate și Parolă ── */}
+          <div className="bg-[#0a0a0a]/60 backdrop-blur-3xl p-8 rounded-[32px] border border-red-500/10 shadow-2xl relative overflow-hidden group">
+            <div className="absolute bottom-0 right-0 w-64 h-64 bg-red-600/5 blur-[100px] rounded-full pointer-events-none group-hover:bg-red-600/10 transition-colors duration-700" />
+            
+            <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6 relative z-10">
+              <div className="flex items-center gap-4">
+                <div className="bg-red-500/10 p-3 rounded-2xl border border-red-500/20 shadow-[inset_0_0_20px_rgba(239,68,68,0.1)]">
+                  <Lock size={24} className="text-red-400" />
+                </div>
+                <h2 className="text-2xl font-black italic text-white tracking-wide">Protocol Securitate</h2>
+              </div>
+              <span className="text-[10px] font-bold text-red-500/50 uppercase tracking-widest border border-red-500/20 bg-red-500/10 px-3 py-1 rounded-full hidden sm:block">
+                Modificare Parolă
+              </span>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 pl-1">
+                  <Key size={14} className="text-red-400" /> Parolă Nouă
+                </label>
                 <input 
                   type="password" 
                   name="newPassword" 
                   value={passwords.newPassword} 
                   onChange={handleChange}
-                  className="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all"
+                  className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white font-medium focus:border-red-500 focus:ring-1 focus:ring-red-500/50 outline-none transition-all placeholder:text-gray-700 shadow-inner"
                   placeholder="Minim 6 caractere"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Confirmă Parola Nouă</label>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2 pl-1">
+                  <ShieldCheck size={14} className="text-red-400" /> Confirmă Parola
+                </label>
                 <input 
                   type="password" 
                   name="confirmPassword" 
                   value={passwords.confirmPassword} 
                   onChange={handleChange}
-                  className="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:border-red-500 focus:ring-1 focus:ring-red-500 outline-none transition-all"
+                  className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white font-medium focus:border-red-500 focus:ring-1 focus:ring-red-500/50 outline-none transition-all placeholder:text-gray-700 shadow-inner"
                   placeholder="Reintrodu noua parolă"
                 />
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Buton Salvare */}
-        <div className="flex justify-end pt-4">
-          <button
-            onClick={handleSavePassword}
-            disabled={isSaving}
-            className="flex items-center gap-2 px-8 py-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white rounded-xl font-bold text-lg transition-all hover:scale-[1.02] shadow-lg shadow-red-500/20"
-          >
-            <ShieldCheck size={24} />
-            {isSaving ? 'Se actualizează...' : 'Actualizează Parola'}
-          </button>
-        </div>
+            {/* Buton Salvare */}
+            <div className="flex justify-end pt-8 relative z-10">
+              <button
+                onClick={handleSavePassword}
+                disabled={isSaving}
+                className="relative group/btn overflow-hidden rounded-2xl p-[1px] shrink-0"
+              >
+                <span className="absolute inset-0 bg-gradient-to-r from-red-500 via-rose-500 to-orange-500 rounded-2xl opacity-70 group-hover/btn:opacity-100 transition-opacity duration-300 blur-md" />
+                <span className="absolute inset-0 bg-gradient-to-r from-red-600 via-rose-600 to-orange-600 rounded-2xl" />
+                <div className="relative px-8 py-4 bg-black/40 backdrop-blur-xl rounded-2xl flex items-center gap-3 transition-all duration-300 group-hover/btn:bg-black/20">
+                  {isSaving ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> 
+                      <span className="text-white font-black text-sm tracking-widest uppercase">Se criptează...</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheck className="text-white group-hover/btn:scale-110 group-hover/btn:-rotate-3 transition-transform" size={22} /> 
+                      <span className="text-white font-black text-sm tracking-widest uppercase text-shadow-sm">Actualizează Parola</span>
+                    </>
+                  )}
+                </div>
+              </button>
+            </div>
+
+          </div>
+        </motion.div>
 
       </div>
     </div>
-=======
-"use client";
-
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { User, Mail, Save, Target, Activity, CheckCircle } from 'lucide-react';
-import { supabase } from '@/src/lib/supabase';
-
-export default function SettingsPage() {
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-
-  // Stările pentru formular
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState(''); // Email-ul de obicei e read-only, dar îl afișăm
-  
-  // Setări extra (pentru care ar trebui să ai un tabel "profiles" în Supabase)
-  const [calorieGoal, setCalorieGoal] = useState('2500');
-  const [waterGoal, setWaterGoal] = useState('8');
-  const [weight, setWeight] = useState('');
-
-  useEffect(() => {
-    fetchUserData();
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      setLoading(true);
-      // Preluăm datele de bază din contul utilizatorului
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-
-      if (user) {
-        setEmail(user.email || '');
-        setName(user.user_metadata?.full_name || '');
-        
-        // Dacă ai creat un tabel 'profiles' pentru celelalte setări, aici le preluăm:
-        /*
-        const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-        if (profile) {
-           setCalorieGoal(profile.calorie_goal || '2500');
-           setWaterGoal(profile.water_goal || '8');
-           setWeight(profile.weight || '');
-        }
-        */
-      }
-    } catch (error) {
-      console.error('Eroare la preluarea datelor:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSaveSettings = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
-    setErrorMsg('');
-    setSuccessMsg('');
-
-    try {
-      // 1. Salvăm Numele în metadata din Supabase Auth
-      const { error: authError } = await supabase.auth.updateUser({
-        data: { full_name: name }
-      });
-      if (authError) throw authError;
-
-      // 2. Salvăm restul setărilor în tabelul "profiles" (opțional, dacă l-ai creat)
-      /*
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { error: profileError } = await supabase.from('profiles').upsert({
-          id: user.id,
-          calorie_goal: parseInt(calorieGoal),
-          water_goal: parseInt(waterGoal),
-          weight: parseFloat(weight)
-        });
-        if (profileError) throw profileError;
-      }
-      */
-
-      setSuccessMsg("Setările au fost salvate cu succes! ⚡");
-      
-      // Ascundem mesajul de succes după 3 secunde
-      setTimeout(() => setSuccessMsg(''), 3000);
-      
-    } catch (error: any) {
-      setErrorMsg(error.message || "A apărut o eroare la salvare.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="h-full w-full flex items-center justify-center p-6 lg:p-12">
-        <div className="w-10 h-10 border-4 border-fuchsia-500/20 border-t-fuchsia-500 rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  return (
-    <main className="h-full w-full p-6 lg:p-12 overflow-y-auto relative z-10 custom-scrollbar">
-      <motion.div 
-        className="max-w-4xl mx-auto" 
-        initial={{ opacity: 0, y: 20 }} 
-        animate={{ opacity: 1, y: 0 }}
-      >
-        
-        {/* Header-ul Paginii */}
-        <div className="mb-10">
-          <p className="text-blue-500 font-mono text-sm tracking-widest uppercase mb-1">Personalizare</p>
-          <h1 className="text-4xl font-black italic tracking-tight text-white">Setările Tale ⚙️</h1>
-          <p className="text-gray-400 mt-2 text-sm">Modifică detaliile contului tău și ajustează-ți obiectivele zilnice.</p>
-        </div>
-
-        <form onSubmit={handleSaveSettings} className="space-y-8">
-          
-          {/* SECȚIUNEA 1: Date Personale */}
-          <div className="bg-[#0a0a0a]/80 backdrop-blur-md border border-white/5 p-6 md:p-8 rounded-[32px] relative overflow-hidden shadow-xl">
-            {/* Glow Subtle de fundal */}
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-fuchsia-500/10 rounded-full blur-[60px]" />
-            
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 relative z-10">
-              <User className="text-fuchsia-400" />
-              Date Personale
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
-              <div className="space-y-2">
-                <label className="text-xs font-bold tracking-widest uppercase text-gray-500 ml-1">Nume Complet</label>
-                <div className="relative group">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-fuchsia-400 transition-colors" />
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-fuchsia-500/50 focus:bg-white/10 transition-all font-medium"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold tracking-widest uppercase text-gray-500 ml-1">Adresă de Email</label>
-                <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
-                  <input
-                    type="email"
-                    value={email}
-                    disabled
-                    className="w-full bg-white/5 border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-gray-400 opacity-70 cursor-not-allowed font-medium"
-                  />
-                </div>
-                <p className="text-[10px] text-gray-500 ml-1">Email-ul nu poate fi schimbat momentan.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* SECȚIUNEA 2: Obiective Fitness */}
-          <div className="bg-[#0a0a0a]/80 backdrop-blur-md border border-white/5 p-6 md:p-8 rounded-[32px] relative overflow-hidden shadow-xl">
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-blue-500/10 rounded-full blur-[60px]" />
-            
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2 relative z-10">
-              <Target className="text-blue-400" />
-              Obiective & Corp
-            </h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-              
-              <div className="space-y-2">
-                <label className="text-xs font-bold tracking-widest uppercase text-gray-500 ml-1">Calorii Zilnice (Kcal)</label>
-                <input
-                  type="number"
-                  value={calorieGoal}
-                  onChange={(e) => setCalorieGoal(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 px-4 text-white text-center focus:outline-none focus:border-blue-500/50 transition-all font-bold text-lg"
-                  placeholder="2500"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold tracking-widest uppercase text-gray-500 ml-1">Apă Zilnic (Pahare)</label>
-                <input
-                  type="number"
-                  value={waterGoal}
-                  onChange={(e) => setWaterGoal(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 px-4 text-white text-center focus:outline-none focus:border-cyan-500/50 transition-all font-bold text-lg"
-                  placeholder="8"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-xs font-bold tracking-widest uppercase text-gray-500 ml-1">Greutate (KG)</label>
-                <div className="relative group">
-                  <Activity className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" />
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-purple-500/50 transition-all font-medium"
-                    placeholder="Ex: 75.5"
-                  />
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          {/* MESAJE DE SUCCES / EROARE */}
-          {errorMsg && (
-            <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium text-center">
-              {errorMsg}
-            </div>
-          )}
-          
-          {successMsg && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
-              className="p-4 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-400 text-sm font-medium flex items-center justify-center gap-2"
-            >
-              <CheckCircle size={18} />
-              {successMsg}
-            </motion.div>
-          )}
-
-          {/* BUTON DE SALVARE */}
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={saving}
-              className="bg-white text-black font-black py-4 px-10 rounded-2xl transition-all transform hover:bg-gray-200 active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50 uppercase tracking-widest text-xs shadow-lg hover:shadow-white/20"
-            >
-              {saving ? (
-                <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Save size={18} />
-                  Salvează Modificările
-                </>
-              )}
-            </button>
-          </div>
-
-        </form>
-      </motion.div>
-    </main>
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   );
 }

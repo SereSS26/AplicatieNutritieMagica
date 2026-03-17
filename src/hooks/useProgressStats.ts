@@ -7,7 +7,6 @@ export function useProgressStats(userId: string | null | undefined) {
   const [loading, setLoading] = useState(true);
   const [streak, setStreak] = useState(0);
   const [weeklyBurned, setWeeklyBurned] = useState(0);
-<<<<<<< HEAD
   const [evolutionData, setEvolutionData] = useState<{ zi: string, valoare: number, realCals: number, eaten: number, burned: number, water: number }[]>([]);
   
   const [avgMacros, setAvgMacros] = useState({ protein: 0, carbs: 0, fat: 0 });
@@ -19,17 +18,12 @@ export function useProgressStats(userId: string | null | undefined) {
   // Heatmap Data va include acum și un flag 'isFuture'
   const [heatmapData, setHeatmapData] = useState<{ date: string, intensity: number, isFuture: boolean }[]>([]);
 
-=======
-  const [evolutionData, setEvolutionData] = useState<{ zi: string, valoare: number, realCals: number }[]>([]);
-  
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   const [badges, setBadges] = useState({
     titan: false,
     hidratare: false,
     precizie: false
   });
 
-<<<<<<< HEAD
   const [userGoals, setUserGoals] = useState({
     calories: 2500,
     water: 8,
@@ -38,14 +32,11 @@ export function useProgressStats(userId: string | null | undefined) {
 
   const [weeklyWorkoutCount, setWeeklyWorkoutCount] = useState(0);
 
-=======
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   const fetchProgressData = useCallback(async () => {
     if (!userId) return;
     setLoading(true);
     
     const today = new Date();
-<<<<<<< HEAD
     
     // --- SETĂRI PENTRU CALENDARUL HEATMAP ---
     const PAST_DAYS = 182; // Jumătate de an (26 săptămâni) în trecut
@@ -212,70 +203,20 @@ export function useProgressStats(userId: string | null | undefined) {
         carbs: Math.round(calculatedTotalCarbs / 7),
         fat: Math.round(calculatedTotalFat / 7)
       });
-=======
-    // Generăm ultimele 7 zile (format YYYY-MM-DD)
-    const last7Days = Array.from({length: 7}, (_, i) => {
-      const d = new Date();
-      d.setDate(today.getDate() - (6 - i));
-      return d.toISOString().split('T')[0];
-    });
-
-    const startDate = last7Days[0];
-    const endDate = last7Days[6];
-
-    try {
-      // 1. Aducem datele din ultimele 7 zile (în paralel pentru viteză)
-      const [
-        { data: meals },
-        { data: exercises },
-        { data: waterStats }
-      ] = await Promise.all([
-        supabase.from('meals').select('date, calories').eq('user_id', userId).gte('date', startDate).lte('date', endDate),
-        supabase.from('exercises').select('date, calories_burned').eq('user_id', userId).gte('date', startDate).lte('date', endDate),
-        supabase.from('daily_stats').select('date, water_glasses').eq('user_id', userId).gte('date', startDate).lte('date', endDate)
-      ]);
-
-      // --- CALCUL GRAFIC EVOLUȚIE ---
-      const dayNames = ["D", "L", "M", "M", "J", "V", "S"];
-      const TARGET_CALORIES = 2500;
-      
-      const chartData = last7Days.map(dateStr => {
-        const dayMeals = meals?.filter(m => m.date === dateStr) || [];
-        const cals = dayMeals.reduce((sum, m) => sum + (m.calories || 0), 0);
-        
-        const dateObj = new Date(dateStr);
-        const ziName = dayNames[dateObj.getDay()];
-        const percentage = cals > 0 ? Math.min(Math.round((cals / TARGET_CALORIES) * 100), 100) : 0;
-        
-        return { zi: ziName, valoare: percentage, realCals: cals };
-      });
-      setEvolutionData(chartData);
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
 
       // --- CALCUL STREAK ---
       let currentStreak = 0;
       for (let i = 6; i >= 0; i--) {
-<<<<<<< HEAD
         if (currentWeekActivity[i]) {
           currentStreak++;
         } else if (i === 6) {
           continue; 
         } else {
           break;
-=======
-        const dateStr = last7Days[i];
-        const hasActivity = (meals?.some(m => m.date === dateStr)) || (exercises?.some(e => e.date === dateStr));
-        
-        if (hasActivity) {
-          currentStreak++;
-        } else if (i !== 6) { 
-          break; // Streak rupt
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
         }
       }
       setStreak(currentStreak);
 
-<<<<<<< HEAD
       let previousStreak = 0;
       for (let i = 6; i >= 0; i--) {
         if (previousWeekActivity[i]) {
@@ -294,19 +235,6 @@ export function useProgressStats(userId: string | null | undefined) {
       setBadges({
         titan: calculatedWorkoutCount >= weeklyWorkoutGoalNum,
         hidratare: calculatedTotalWater >= (weeklyWaterGoalTotal * 0.8),
-=======
-      // --- CALCUL CALORII ARSE ---
-      const totalBurned = exercises?.reduce((sum, e) => sum + (e.calories_burned || 0), 0) || 0;
-      setWeeklyBurned(totalBurned);
-
-      // --- VERIFICARE TROFEE ---
-      const totalWater = waterStats?.reduce((sum, w) => sum + (w.water_glasses || 0), 0) || 0;
-      const workoutCount = exercises?.length || 0;
-      
-      setBadges({
-        titan: workoutCount >= 3,
-        hidratare: totalWater >= 40,
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
         precizie: currentStreak >= 3
       });
 
@@ -326,7 +254,6 @@ export function useProgressStats(userId: string | null | undefined) {
     streak,
     weeklyBurned,
     evolutionData,
-<<<<<<< HEAD
     badges,
     userGoals,
     weeklyWorkoutCount,
@@ -336,8 +263,5 @@ export function useProgressStats(userId: string | null | undefined) {
     avgMacros,
     heatmapData, 
     refreshData: fetchProgressData
-=======
-    badges
->>>>>>> cf1ae22a259f9391ac1f0aa4377454bd986eaeaf
   };
 }
